@@ -64,10 +64,11 @@ if __name__ == '__main__':
       print 'mode        ' , gpsd.fix.mode
       print
       print 'sats        ' , gpsd.satellites
+      print(csv)
       writer.writerows(csv)
       csv=[]
-      time.sleep(1) #set to whatever
- 
+      time.sleep(1) #records once a second
+
   except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
     print "\nKilling Thread..."
     gpsp.running = False
