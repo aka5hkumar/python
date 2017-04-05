@@ -16,6 +16,7 @@ import time
 import threading
 import csv
 import Adafruit_LSM303
+run_time=sys.argv[1]
 
 gpsd = None #setting the global variable
 lsm303 = Adafruit_LSM303.LSM303()
@@ -84,7 +85,7 @@ if __name__ == '__main__':
 
       time.sleep(.5)
 
-      if (i==1200):
+      if (i==run_time):
           print('export csv')
      #pops matrix into a csv function
           with open('gpsData.csv', 'wb') as f1:
