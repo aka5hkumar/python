@@ -18,13 +18,14 @@ import threading
 import csv
 import Adafruit_LSM303
 import picamera
-run_time=sys.argv[1]
+run_time=55
+# run_time=sys.argv[1]
 
 gpsd = None #setting the global variable
-lsm303 = Adafruit_LSM303.LSM303()
 camera = picamera.PiCamera()
-# os.system('clear') #clear the terminal (optional)
-
+lsm303 = Adafruit_LSM303.LSM303()
+os.system('clear') #clear the terminal (optional)
+camera.start_recording('record.h264')
 class GpsPoller(threading.Thread):
   def __init__(self):
     threading.Thread.__init__(self)
@@ -36,7 +37,6 @@ class GpsPoller(threading.Thread):
   def run(self):
     global gpsd
     while gpsp.running:
-      camera.start_recording('record.h264')
       gpsd.next() #this will continue to loop and grab EACH set of gpsd info to clear the buffer
 
 if __name__ == '__main__':
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     # with open('gpsData.csv', 'wb') as f:    #
     #     writer = csv.writer(f)    #
     #     csv=['Latitude', 'Longitude', 'Time', 'Altitude', 'Speed', 'Climb']    #
-    #     writer.writerows(csv)]
+    #     writer.writerows(csv)
     i=0
     titles=['Acceleration X','Acceleration Y','Acceleration Z','Magnetism X','Magnetism Y','Magnetism Z','Latitude','Longitude','Altitude','Speed','Climb']
     #Units=
@@ -80,7 +80,7 @@ if __name__ == '__main__':
       tempClb=(gpsd.fix.climb)
       #Writes to a temp array
       csvFile.append([accel_x,accel_y,accel_z,mag_x,mag_y,mag_z,tempLat,tempLong,tempAlt,tempSpd,tempClb])
-
+    #   print(csvFile)
       i+=1
       print ('----------------------------------------')
       print('Clock (1/2 a second)')
@@ -93,8 +93,8 @@ if __name__ == '__main__':
           print('export csv')
           camera.stop_recording()
      #pops matrix into a csv function
-          with open('gpsData.csv', 'wb') as f1:
-             writer = csv.writer(f1)
+          with open('gpsData.csv', 'wb') as somecsv:
+             writer = csv.writer(somecsv)
              writer.writerows(csvFile)
              gpsp.running = False
              gpsp.join() # wait for the thread to finish what it's doing
@@ -103,6 +103,7 @@ if __name__ == '__main__':
 
   except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
     print "\nKilling Thread..."
+    camera.stop_recording()
     gpsp.running = False
     gpsp.join() # wait for the thread to finish what it's doing
   print "Done.\nExiting."
