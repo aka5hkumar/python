@@ -8,18 +8,21 @@
 # Author: Tony DiCola
 # License: Public Domain
 
-#Modified Akash Kumar
+#Modified by Akash Kumar
 import os
+from sys import argv
 from gps import *
 from time import *
 import time
 import threading
 import csv
 import Adafruit_LSM303
+import picamera
 run_time=sys.argv[1]
 
 gpsd = None #setting the global variable
 lsm303 = Adafruit_LSM303.LSM303()
+camera = picamera.PiCamera()
 # os.system('clear') #clear the terminal (optional)
 
 class GpsPoller(threading.Thread):
@@ -33,6 +36,7 @@ class GpsPoller(threading.Thread):
   def run(self):
     global gpsd
     while gpsp.running:
+      camera.start_recording('record.h264')
       gpsd.next() #this will continue to loop and grab EACH set of gpsd info to clear the buffer
 
 if __name__ == '__main__':
@@ -87,6 +91,7 @@ if __name__ == '__main__':
 
       if (i==run_time):
           print('export csv')
+          camera.stop_recording()
      #pops matrix into a csv function
           with open('gpsData.csv', 'wb') as f1:
              writer = csv.writer(f1)
